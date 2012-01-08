@@ -38,6 +38,8 @@ post '/request' do
 end
 
 helpers do
+  
+  # From https://github.com/unixcharles/vcr-remote-controller
 
   def cassettes
     Dir["#{VCR::Config.cassette_library_dir}/**/*.yml"].map do |f|
