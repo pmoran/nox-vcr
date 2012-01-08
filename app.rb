@@ -31,13 +31,25 @@ class App < Sinatra::Base
 
 
   post '/request' do
-    uri = URI.parse(request.env['HTTP_NOX_URL'])
+    if nox_url
+      resp = do_post(nox_url)
+      status resp.code
+      body resp.body
+    else
+      body "NOX_URL must be set as a request header"
+      status 400
+    end
+  end
+  
+  def do_post(uri)
     puts "*** VCR request: #{uri}"
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
-    resp = http.post(uri.request_uri, request.body)
-    status resp.code
-    body resp.body
+    http.post(uri.request_uri, request.body)
+  end
+  
+  def nox_url
+    @url ||= URI.parse(request.env['HTTP_NOX_URL']) rescue nil
   end
 
   helpers do
