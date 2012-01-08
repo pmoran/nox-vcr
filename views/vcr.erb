@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>VCR Remote Controller</title>
+  </head>
+  <body>
+    <h1>VCR Remote Controller</h1> 
+      <%= current_cassette_status %>
+    <hr/>
+    <form method="post">
+      <p>Select a cassettes:</p>
+       <%= cassettes_radio_fields %>
+      <p><label><input type="radio" name="cassette" value="create_new_cassette"<%=' selected' if current_cassette_empty? or !(cassettes.include?(current_cassette)) %>>Create a new cassette</label></p>
+      <p><label>New cassette name<input type="text" name="new_cassette_name"></label>
+      </p>
+      <p>Record mode:</p>
+      <p>
+        <%= record_modes_fields %>
+      </p>
+      <p>
+        <input type="submit" name="submit" value="<%='Eject and ' if cassette?%>Insert cassette">
+        <input type="submit" name="submit" value="Eject">
+      </p>
+    </form>
+    <% new_recored_information %>
+  </body>
+</html>
