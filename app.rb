@@ -4,8 +4,6 @@ require 'cgi'
 
 class App < Sinatra::Base
 
-  set :port, 7654
-
   configure do
     VCR.config do |c|
       c.cassette_library_dir = "/Users/petermoran/workspace/jetstar/newco/spec/fixtures/vcr_cassettes"
@@ -21,10 +19,11 @@ class App < Sinatra::Base
   post '/vcr' do
     VCR.eject_cassette if cassette?
     unless request.params['submit'] == 'Eject'
+      record_mode = request.params['record_mode'].to_sym
       if request.params['cassette'] == 'create_new_cassette'
-        VCR.insert_cassette(request.params["new_cassette_name"], :record => request.params['record_mode'].to_sym)
+        VCR.insert_cassette(request.params["new_cassette_name"], :record => record_mode)
       else
-        VCR.insert_cassette(request.params['cassette'], :record => request.params['record_mode'].to_sym)
+        VCR.insert_cassette(request.params['cassette'], :record => record_mode)
       end
     end
     erb :vcr
@@ -60,7 +59,7 @@ class App < Sinatra::Base
     end
 
     def cassette?
-      !(VCR.current_cassette == nil)
+      VCR.current_cassette
     end
 
     def current_cassette_empty?
