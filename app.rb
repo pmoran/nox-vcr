@@ -4,51 +4,14 @@ require 'cgi'
 
 class App < Sinatra::Base
 
+  set :show_exceptions, false
+
   configure do
     VCR.config do |c|
       c.cassette_library_dir = "/Users/petermoran/workspace/jetstar/newco/spec/fixtures/vcr_cassettes"
       c.default_cassette_options = { :record => :none }
       c.stub_with :webmock
     end
-  end
-
-  get '/vcr' do
-    haml :vcr
-  end
-
-  post '/vcr' do
-    VCR.eject_cassette if cassette?
-    unless request.params['submit'] == 'Eject'
-      record_mode = request.params['record_mode'].to_sym
-      if request.params['cassette'] == 'create_new_cassette'
-        VCR.insert_cassette(request.params["new_cassette_name"], :record => record_mode)
-      else
-        VCR.insert_cassette(request.params['cassette'], :record => record_mode)
-      end
-    end
-    haml :vcr
-  end
-
-  post '/request' do
-    if nox_url
-      resp = do_post(nox_url)
-      status resp.code
-      body resp.body
-    else
-      body "NOX_URL must be set as a request header"
-      status 400
-    end
-  end
-
-  def do_post(uri)
-    puts "*** VCR request: #{uri}"
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = uri.scheme == "https"
-    http.post(uri.request_uri, request.body)
-  end
-
-  def nox_url
-    @url ||= URI.parse(request.env['HTTP_NOX_URL']) rescue nil
   end
 
   helpers do
@@ -85,6 +48,49 @@ class App < Sinatra::Base
       VCR::Config.default_cassette_options[:record]
     end
 
+  end
+
+  # Configure VCR
+  get '/vcr' do
+    haml :vcr
+  end
+
+  post '/vcr' do
+    VCR.eject_cassette if cassette?
+    unless request.params['submit'] == 'Eject'
+      record_mode = request.params['record_mode'].to_sym
+      if request.params['cassette'] == 'create_new_cassette'
+        VCR.insert_cassette(request.params["new_cassette_name"], :record => record_mode)
+      else
+        VCR.insert_cassette(request.params['cassette'], :record => record_mode)
+      end
+    end
+    haml :vcr
+  end
+
+  # Handle proxied requests
+  post '/request' do
+    if nox_url
+      resp = do_post(nox_url)
+      status resp.code
+      body resp.body
+    else
+      body "NOX_URL must be set as a request header"
+      status 400
+    end
+  end
+
+  private
+
+  def do_post(uri)
+    puts "*** VCR request: #{uri}"
+    http = Net::HTTP.new(uri.host, uri.port)
+    http.use_ssl = uri.scheme == "https"
+    http.post(uri.request_uri, request.body)
+  end
+
+  def nox_url
+    @url ||= URI.parse(request.env['HTTP_NOX_URL']) rescue nil
   end
 
 end
