@@ -13,7 +13,7 @@ class App < Sinatra::Base
   end
 
   get '/vcr' do
-    erb :vcr
+    haml :vcr
   end
 
   post '/vcr' do
@@ -26,9 +26,8 @@ class App < Sinatra::Base
         VCR.insert_cassette(request.params['cassette'], :record => record_mode)
       end
     end
-    erb :vcr
+    haml :vcr
   end
-
 
   post '/request' do
     if nox_url
@@ -40,20 +39,20 @@ class App < Sinatra::Base
       status 400
     end
   end
-  
+
   def do_post(uri)
     puts "*** VCR request: #{uri}"
     http = Net::HTTP.new(uri.host, uri.port)
     http.use_ssl = uri.scheme == "https"
     http.post(uri.request_uri, request.body)
   end
-  
+
   def nox_url
     @url ||= URI.parse(request.env['HTTP_NOX_URL']) rescue nil
   end
 
   helpers do
-  
+
     # From https://github.com/unixcharles/vcr-remote-controller
 
     def cassettes
@@ -85,37 +84,6 @@ class App < Sinatra::Base
     def default_record_mode
       VCR::Config.default_cassette_options[:record]
     end
-
-    def current_cassette_status
-      if cassette?
-        %Q{<p>Current cassette: <b>#{current_cassette}</b> #{ '- (empty)' if current_cassette_empty? }</p>
-           <p>Record mode: <b>:#{current_cassette_record_mode}</b></p>}
-       else
-         '<p>No cassette in the VCR</p>'
-       end
-     end
-
-     def cassettes_radio_fields
-       cassettes.map do |cassette|
-         cassette_name = CGI::escapeHTML(cassette)
-         selected = current_cassette == cassette
-         %Q{<p><label><input type="radio" name="cassette" value="#{cassette_name}"#{' checked' if selected}>#{cassette_name}</label></p>}
-        end.join("\n")
-      end
-
-      def record_modes_fields
-        [:once, :new_episodes, :none, :all].map do |record_mode|
-          %Q{<label><input type="radio" name="record_mode" value="#{record_mode}"#{ ' checked' if record_mode == default_record_mode}>:#{record_mode}</label>}
-        end.join("\n")
-      end
-
-       def new_recored_information
-         %Q{<p>New recorded interactions</p>
-            <hr/>
-            <pre><code>
-            #{ CGI::escapeHTML current_cassette_new_recorded_interactions }
-            </code></pre>} if cassette? and !(current_cassette_empty?)
-       end
 
   end
 
