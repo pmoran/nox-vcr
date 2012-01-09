@@ -8,7 +8,7 @@ class App < Sinatra::Base
 
   configure do
     VCR.config do |c|
-      c.cassette_library_dir = "/Users/petermoran/workspace/jetstar/newco/spec/fixtures/vcr_cassettes"
+      c.cassette_library_dir = "spec/fixtures/vcr_cassettes"
       c.default_cassette_options = { :record => :none }
       c.stub_with :webmock
     end
