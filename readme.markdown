@@ -1,7 +1,7 @@
 # Overview
-nox_vcr lets you run VCR outside of your application. It is a Sinatra application that lets you insert and inject VCR cassettes. You can then use it as a proxy for http requests that you want VCR to handle (e.g. record or replay). We did this because:
+nox_vcr runs VCR outside of your application. It is a Sinatra application that lets you insert and inject VCR cassettes. You can then use it as a proxy for http requests that you want VCR to handle (e.g. record or replay). We did this because:
 
-* We already had a mechanism (nox-ruby) to hijack http request and send them to a proxy (nox)
+* We already had a mechanism (nox-ruby) to hijack http requests and send them to a proxy (nox)
 * We make http requests from within our Rails application and from background jobs (resque)
 
 Nox is something from a TV show apparently. Ask https://github.com/keithpitt.
@@ -18,4 +18,5 @@ Nox is something from a TV show apparently. Ask https://github.com/keithpitt.
 * Make your http request to localhost:9292/request
 
 # Credits
-* Much of the VCR-handling code came from https://github.com/unixcharles/vcr-remote-controller. I recommend you look at or use this if you want to run VCR inside your application.
+* Much of the VCR-handling code came from [vcr-remote-controller](https://github.com/unixcharles/vcr-remote-controller). I recommend you look at or use this if you want to run VCR inside your application
+* [VCR](https://github.com/myronmarston/vcr) makes recording and playing back http interactions very easy in Ruby
