@@ -7,7 +7,7 @@ class App < Sinatra::Base
   set :show_exceptions, false
 
   configure do
-    VCR.config do |c|
+    VCR.configure do |c|
       c.cassette_library_dir = "spec/fixtures/vcr_cassettes"
       c.default_cassette_options = { :record => :none }
       c.stub_with :webmock
@@ -19,8 +19,8 @@ class App < Sinatra::Base
     # From https://github.com/unixcharles/vcr-remote-controller
 
     def cassettes
-      Dir["#{VCR::Config.cassette_library_dir}/**/*.yml"].map do |f|
-        f.match(/^#{Regexp.escape(VCR::Config.cassette_library_dir.to_s)}\/(.+)\.yml/)[1]
+      Dir["#{VCR::configuration.cassette_library_dir}/**/*.yml"].map do |f|
+        f.match(/^#{Regexp.escape(VCR::configuration.cassette_library_dir.to_s)}\/(.+)\.yml/)[1]
       end
     end
 
@@ -45,7 +45,7 @@ class App < Sinatra::Base
     end
 
     def default_record_mode
-      VCR::Config.default_cassette_options[:record]
+      VCR::configuration.default_cassette_options[:record]
     end
 
   end
