@@ -8,8 +8,8 @@ class App < Sinatra::Base
 
   configure do
     VCR.configure do |c|
-      c.cassette_library_dir = "spec/fixtures/vcr_cassettes"
-      c.default_cassette_options = { :record => :none }
+      c.cassette_library_dir = "spec/fixtures"
+      c.default_cassette_options = { :record => :none, :allow_playback_repeats => true }
       c.stub_with :webmock
     end
   end
@@ -70,27 +70,27 @@ class App < Sinatra::Base
 
   # Handle proxied requests
   post '/request' do
-    if nox_url
-      resp = do_post(nox_url)
-      status resp.code
-      body resp.body
-    else
+    unless nox_url
       body "NOX_URL must be set as a request header"
       status 400
+      return
     end
-  end
 
-  private
-
-  def do_post(uri)
-    puts "*** VCR request: #{uri}"
-    http = Net::HTTP.new(uri.host, uri.port)
-    http.use_ssl = uri.scheme == "https"
-    http.post(uri.request_uri, request.body)
+    http = Net::HTTP.new(nox_url.host, nox_url.port)
+    http.use_ssl = nox_url.scheme == "https"
+    method = request.env["HTTP_NOX_METHOD"]
+    puts "*** VCR #{method} request: #{nox_url}"
+    if (method == "POST")
+      resp http.post(nox_url.request_uri, request.body)
+    else
+      resp = http.get(nox_url.request_uri)
+    end
+    status resp.code
+    body resp.body
   end
 
   def nox_url
-    @url ||= URI.parse(request.env['HTTP_NOX_URL']) rescue nil
+    @url ||= URI.parse(request.env['HTTP_NOX_URL'])
   end
 
 end
