@@ -8,7 +8,7 @@ class App < Sinatra::Base
 
   configure do
     VCR.configure do |c|
-      c.cassette_library_dir = "spec/fixtures"
+      c.cassette_library_dir = "/Users/petermoran/workspace/hooroo/hotels/spec/fixtures"
       c.default_cassette_options = { :record => :none, :allow_playback_repeats => true }
       c.stub_with :webmock
     end
@@ -81,7 +81,7 @@ class App < Sinatra::Base
     method = request.env["HTTP_NOX_METHOD"]
     puts "*** VCR #{method} request: #{nox_url}"
     if (method == "POST")
-      resp http.post(nox_url.request_uri, request.body)
+      resp = http.post(nox_url.request_uri, request.body)
     else
       resp = http.get(nox_url.request_uri)
     end
