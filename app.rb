@@ -1,6 +1,8 @@
 require 'sinatra'
 require 'vcr'
 require 'cgi'
+require 'pry'
+require 'pry-debugger'
 
 class App < Sinatra::Base
 
@@ -8,7 +10,7 @@ class App < Sinatra::Base
 
   configure do
     VCR.configure do |c|
-      c.cassette_library_dir = "/Users/petermoran/workspace/hooroo/hotels/spec/fixtures/manual_vcr_cassettes"
+      c.cassette_library_dir = "spec/fixtures"
       c.default_cassette_options = { :record => :none, :allow_playback_repeats => true }
       c.stub_with :webmock
     end
@@ -58,12 +60,7 @@ class App < Sinatra::Base
   post '/vcr' do
     VCR.eject_cassette if cassette?
     unless request.params['submit'] == 'Eject'
-      record_mode = request.params['record_mode'].to_sym
-      if request.params['cassette'] == 'create_new_cassette'
-        VCR.insert_cassette(request.params["new_cassette_name"], :record => record_mode)
-      else
-        VCR.insert_cassette(request.params['cassette'], :record => record_mode)
-      end
+      VCR.insert_cassette(request.params['cassette'], :record => :none)
     end
     haml :vcr
   end
@@ -71,7 +68,7 @@ class App < Sinatra::Base
   # Handle proxied requests
   post '/request' do
     unless nox_url
-      body "NOX_URL must be set as a request header"
+      body "HTTP_NOX_URL must be set as a request header"
       status 400
       return
     end

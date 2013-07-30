@@ -8,14 +8,15 @@
       -if cassette?
         Current cassette:
         %b #{current_cassette}
-        \- (empty)
       -else
         No cassette in the VCR
-    %p
-      Record mode:
-      %b #{current_cassette_record_mode}
     %hr
     %form{:method => "post"}
+      %p
+        %input{:name => "submit", :type => "submit", :value => cassette? ? "Eject and insert cassette" : "Insert cassette"}
+        %input{:name => "submit", :type => "submit", :value => "Eject"}
+
+
       %p Select a cassettes:
       -cassettes.map do |cassette|
         -cassette_name = CGI::escapeHTML(cassette)
@@ -23,21 +24,6 @@
         %p
           %label
             %input{:name => "cassette", :type => "radio", :value => cassette_name, :checked => selected || nil} #{cassette_name}
-      %p
-        %label
-          %input{:name => "cassette", :type => "radio", :value => "create_new_cassette" } Create a new cassette
-      %p
-        %label
-          New cassette name
-          %input{:name => "new_cassette_name", :type => "text"}
-      %p Record mode:
-      %p
-        -[:once, :new_episodes, :none, :all].map do |record_mode|
-          %label
-            %input{:type => "radio", :name => "record_mode", :value => "#{record_mode}", :checked => record_mode == default_record_mode || nil} #{record_mode}
-      %p
-        %input{:name => "submit", :type => "submit", :value => cassette? ? "Eject and insert cassette" : "Insert cassette"}
-        %input{:name => "submit", :type => "submit", :value => "Eject"}
 
     -if cassette? and !(current_cassette_empty?)
       %p
