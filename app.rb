@@ -8,7 +8,7 @@ class App < Sinatra::Base
 
   configure do
     VCR.configure do |c|
-      c.cassette_library_dir = "/Users/petermoran/workspace/hooroo/hotels/spec/fixtures"
+      c.cassette_library_dir = "/Users/petermoran/workspace/hooroo/hotels/spec/fixtures/manual_vcr_cassettes"
       c.default_cassette_options = { :record => :none, :allow_playback_repeats => true }
       c.stub_with :webmock
     end
